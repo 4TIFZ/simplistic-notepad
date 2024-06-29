@@ -1,139 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/x-icon" href="simplistic-notepad-logo.png">
-<title>Simplistic Notepad</title>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editor</title>
+    <style>
 	@font-face {
             font-family: 'LemonMilk';
             src: url('lemon_milk.otf') format('opentype');
         }
-    body, button, input, select, textarea {
-        font-family: 'LemonMilk', Arial, sans-serif;
-    }
-    body {
-        font-weight: 400;
-        background-color: #000000;
-        color: #ffffff;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    h1 {
-        margin-bottom: 20px;
-        font-weight: 700;
-    }
-    #editor {
-        width: 90%;
-        height: 300px;
-        margin-bottom: 20px;
-        border: 2px solid #ffffff;
-        padding: 10px;
-        font-size: 16px;
-        resize: none;
-        border-radius: 15px;
-        outline: none;
-        background-color: transparent;
-        color: #ffffff;
-        overflow-y: auto; /* Add scrollbar when text overflows vertically */
-    }
-    #editor.inverted {
-        filter: invert(1);
-    }
-    button, .theme-toggle {
-        padding: 10px 20px;
-        background-color: #ffffff;
-        color: #000000;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 600;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    button:hover, .theme-toggle:hover {
-        background-color: #000000;
-        color: #ffffff;
-    }
-    .button-container {
-        display: flex;
-        gap: 10px;
-    }
-</style>
+        body {
+	    font-family: 'LemonMilk', Arial, sans-serif; /* Lemon Milk font */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .title-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin: 0;
+            margin-right: 10px;
+        }
+        .info {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            font-size: 18px;
+            color: #555;
+        }
+        .info:hover .info-box {
+            display: block;
+        }
+        .info-box {
+            display: none;
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            z-index: 1;
+        }
+        textarea {
+            width: 80%;
+            height: 300px;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .file-name {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-<h1>Simplistic Notepad</h1>
-<div id="editor" contenteditable="true"></div>
-<div class="button-container">
-    <button id="saveButton">Save to Device</button>
-    <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
-</div>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
+    <div class="title-container">
+        <h1>Simple Text Editor</h1>
+        <div class="info">
+            ?
+            <div class="info-box">
+                <strong>Update Information:</strong><br>
+                - Added save to device feature.<br>
+                - Text is retained in local storage.<br>
+                - Customizable file name.
+            </div>
+        </div>
+    </div>
+    <input type="text" id="fileName" class="file-name" placeholder="Enter file name..." value="">
+    <textarea id="editor" placeholder="Start typing..."></textarea>
+    <button onclick="saveTextToFile()">Save to Device</button>
+
+    <script>
         const editor = document.getElementById('editor');
-        const saveButton = document.getElementById('saveButton');
-        const themeToggle = document.getElementById('themeToggle');
-        const savedText = localStorage.getItem('savedText');
-        let isDarkTheme = true;
+        const fileNameInput = document.getElementById('fileName');
 
-        if (savedText) {
-            editor.innerText = savedText;
-        }
-
-        editor.addEventListener('input', function() {
-            const textToSave = editor.innerText;
-            localStorage.setItem('savedText', textToSave);
-        });
-
-        saveButton.addEventListener('click', function() {
-            const textToSave = editor.innerText;
-            // Create a link to download the text as a .txt file
-            const blob = new Blob([textToSave], {type: 'text/plain'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'text_file.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-
-        themeToggle.addEventListener('click', function() {
-            isDarkTheme = !isDarkTheme;
-            updateTheme();
-        });
-
-        function updateTheme() {
-            if (isDarkTheme) {
-                document.body.style.backgroundColor = '#000000';
-                document.body.style.color = '#ffffff';
-                saveButton.style.backgroundColor = '#ffffff';
-                saveButton.style.color = '#000000';
-                themeToggle.style.backgroundColor = '#ffffff';
-                themeToggle.style.color = '#000000';
-                editor.classList.remove('inverted');
-            } else {
-                document.body.style.backgroundColor = '#ffffff';
-                document.body.style.color = '#000000';
-                saveButton.style.backgroundColor = '#000000';
-                saveButton.style.color = '#ffffff';
-                themeToggle.style.backgroundColor = '#000000';
-                themeToggle.style.color = '#ffffff';
-                editor.classList.add('inverted');
+        // Load saved text from local storage when the page loads
+        window.onload = function() {
+            const savedText = localStorage.getItem('textEditorContent');
+            if (savedText) {
+                editor.value = savedText;
             }
-        }
+        };
 
-        // Initialize theme
-        updateTheme();
-    });
-</script>
+        // Save text to local storage every time the user types
+        editor.addEventListener('input', function() {
+            localStorage.setItem('textEditorContent', editor.value);
+        });
+
+        // Save the text to a file
+        function saveTextToFile() {
+            const text = editor.value;
+            const fileName = fileNameInput.value || 'textEditorContent.txt';
+            const blob = new Blob([text], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = fileName;
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.target = '_blank';
+            anchor.style.display = 'none'; // don't display the link
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        }
+    </script>
 </body>
 </html>
